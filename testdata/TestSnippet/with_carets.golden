@@ -1,0 +1,11 @@
+error: you can't do that
+     ╭─[fetch.go:10:14]
+     │ 
+   8 │ func fetch(id int) (string, error) {
+   9 │     if id < 0 {
+  10 │         return "", errors.New("negative id")
+     ·                    ^^^^^^^^^^  dynamic error created here
+  11 │     }
+  12 │ 
+     │ 
+     ╰─
