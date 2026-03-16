@@ -7,20 +7,24 @@ import (
 )
 
 type Characters struct {
-	Top  string
-	Mid  string
-	Bot  string
-	Dash string
-	Dot  string
+	Top      string
+	Mid      string
+	Bot      string
+	Dash     string
+	Dot      string
+	HintHelp string
+	HintNote string
 }
 
 func DefaultCharacters() Characters {
 	return Characters{
-		Top:  "╭",
-		Mid:  "│",
-		Bot:  "╰",
-		Dash: "─",
-		Dot:  "·",
+		Top:      "╭",
+		Mid:      "│",
+		Bot:      "╰",
+		Dash:     "─",
+		Dot:      "·",
+		HintHelp: "›",
+		HintNote: "≋",
 	}
 }
 
@@ -42,6 +46,7 @@ type Config struct {
 	Characters     Characters
 	Prefixes       Prefixes
 	SeverityLabels SeverityLabels
+	DetailPad      int
 }
 
 func DefaultConfig() Config {
@@ -51,5 +56,22 @@ func DefaultConfig() Config {
 		Characters:     DefaultCharacters(),
 		Prefixes:       DefaultPrefixes(),
 		SeverityLabels: DefaultSeverityLabels(),
+		DetailPad:      2,
 	}
+}
+
+func (c Characters) hint(ch string) string {
+	if ch == "" {
+		return ""
+	}
+
+	return ch + " "
+}
+
+func (c Config) effectiveDetailPad() int {
+	if c.DetailPad > 0 {
+		return c.DetailPad
+	}
+
+	return 2
 }

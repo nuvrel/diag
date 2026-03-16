@@ -1,4 +1,5 @@
 error: you can't do that
+
     ╭─[fetch.go]
     │ 
   1 │ package main
