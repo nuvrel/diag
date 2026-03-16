@@ -23,7 +23,7 @@ func DefaultCharacters() Characters {
 		Bot:      "╰",
 		Dash:     "─",
 		Dot:      "·",
-		HintHelp: "⌁",
+		HintHelp: "›",
 		HintNote: "≋",
 	}
 }
