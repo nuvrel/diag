@@ -1,4 +1,5 @@
 error: you can't do that
+
      ╭─[fetch.go:10:14]
      │ 
    8 │ func fetch(id int) (string, error) {

@@ -4,6 +4,7 @@ type Diagnostic struct {
 	severity Severity
 	message  string
 	code     string
+	detail   []string
 	blocks   []block
 }
 
@@ -17,6 +18,12 @@ func NewWarning(msg string) Diagnostic {
 
 func (d Diagnostic) Code(code string) Diagnostic {
 	d.code = code
+
+	return d
+}
+
+func (d Diagnostic) Detail(paragraphs ...string) Diagnostic {
+	d.detail = paragraphs
 
 	return d
 }

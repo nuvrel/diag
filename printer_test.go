@@ -31,6 +31,30 @@ func TestPrinter(t *testing.T) {
 			diags: []diag.Diagnostic{diag.NewError("you can't do that").Help("try this instead").Note("see the docs")},
 		},
 		{
+			name: "detail",
+			diags: []diag.Diagnostic{
+				diag.NewError("you can't do that").
+					Detail(
+						"This is a detailed explanation of the error.",
+						"This is a second paragraph with more context.",
+					),
+			},
+		},
+		{
+			name: "ordering",
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").
+					Help("try this instead").
+					Snippet(diag.NewSnippet([]byte("var y = x + z")).
+						File("main.go").
+						From(1, 13).
+						To(1, 14).
+						Message("z is not defined"),
+					).
+					Note("see the docs"),
+			},
+		},
+		{
 			name: "multiple",
 			diags: []diag.Diagnostic{
 				diag.NewError("something went wrong").Code("E001"),

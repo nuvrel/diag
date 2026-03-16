@@ -2,8 +2,11 @@ package diag
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
+	"slices"
+	"strings"
 
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/colorprofile"
@@ -39,18 +42,67 @@ func (p *Printer) Print(diags ...Diagnostic) error {
 
 func (p *Printer) print(d Diagnostic) {
 	p.printHeader(d)
+	p.printDetail(d)
+	p.printBlocks(d)
+}
 
-	for _, b := range d.blocks {
-		switch b := b.(type) {
-		case *Snippet:
-			(&snippeter{printer: p, snippet: b, severity: d.severity}).print()
-		case *help:
-			p.writeStyled(p.config.Theme.Help, p.config.Prefixes.Help+": ")
-			p.write(b.content)
+func (p *Printer) printBlocks(d Diagnostic) {
+	sorted := slices.SortedStableFunc(slices.Values(d.blocks), func(a, b block) int {
+		return cmp.Compare(blockRank(a), blockRank(b))
+	})
+
+	for i, b := range sorted {
+		if i == 0 || blockRank(b) != blockRank(sorted[i-1]) {
 			p.writeln()
-		case *note:
-			p.writeStyled(p.config.Theme.Note, p.config.Prefixes.Note+": ")
-			p.write(b.content)
+		}
+
+		p.printBlock(b, d.severity)
+	}
+}
+
+func (p *Printer) printBlock(b block, severity Severity) {
+	switch b := b.(type) {
+	case *Snippet:
+		(&snippeter{printer: p, snippet: b, severity: severity}).print()
+	case *help:
+		p.writeStyled(
+			p.config.Theme.Help,
+			p.config.Characters.hint(p.config.Characters.HintHelp)+p.config.Prefixes.Help+": ",
+		)
+		p.write(b.content)
+		p.writeln()
+	case *note:
+		p.writeStyled(
+			p.config.Theme.Note,
+			p.config.Characters.hint(p.config.Characters.HintNote)+p.config.Prefixes.Note+": ",
+		)
+		p.write(b.content)
+		p.writeln()
+	}
+}
+
+func blockRank(b block) int {
+	switch b.(type) {
+	case *Snippet:
+		return 0
+	default:
+		return 1
+	}
+}
+
+func (p *Printer) printDetail(d Diagnostic) {
+	if len(d.detail) == 0 {
+		return
+	}
+
+	indent := strings.Repeat(" ", p.config.effectiveDetailPad())
+
+	p.writeln()
+
+	for _, pg := range d.detail {
+		for line := range strings.SplitSeq(pg, "\n") {
+			p.write(indent)
+			p.writeStyled(p.config.Theme.Detail, line)
 			p.writeln()
 		}
 	}

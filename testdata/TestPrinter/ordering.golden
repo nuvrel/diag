@@ -1,0 +1,11 @@
+error: something went wrong
+
+    ╭─[main.go:1:13]
+    │ 
+  1 │ var y = x + z
+    ·             ^  z is not defined
+    │ 
+    ╰─
+
+⌁ help: try this instead
+≋ note: see the docs
