@@ -95,13 +95,15 @@ func (p *Printer) printDetail(d Diagnostic) {
 		return
 	}
 
-	p.writeln()
-
 	if p.config.DetailFunc != nil {
 		p.write(p.config.DetailFunc(d.detail))
 		p.writeln()
 
 		return
+	}
+
+	if !p.config.SkipHeader {
+		p.writeln()
 	}
 
 	indent := strings.Repeat(" ", p.config.effectiveDetailPad())
