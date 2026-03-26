@@ -47,6 +47,11 @@ type Config struct {
 	Prefixes       Prefixes
 	SeverityLabels SeverityLabels
 	DetailPad      int
+	Margin         int
+	HeaderFunc     func(severity, code, message string) string
+	DetailFunc     func(detail []string) string
+	SkipHeader     bool
+	SkipDetail     bool
 }
 
 func DefaultConfig() Config {

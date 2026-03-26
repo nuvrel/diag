@@ -70,7 +70,9 @@ func (s snippeter) writeBorder(width int, content string) {
 }
 
 func (s snippeter) writeIndent(width int) {
-	s.printer.write(strings.Repeat(" ", width+3))
+	extra := s.snippet.effectiveMargin()
+
+	s.printer.write(strings.Repeat(" ", width+3+extra))
 }
 
 func (s snippeter) printLines(width, start, end, pad int) {
@@ -125,8 +127,9 @@ func (s snippeter) writeCarets(line string) {
 
 func (s snippeter) writeLineNumber(num, width int, style lipgloss.Style) {
 	str := strconv.Itoa(num)
+	extra := s.snippet.effectiveMargin()
 
-	s.printer.write(strings.Repeat(" ", width-len(str)+2))
+	s.printer.write(strings.Repeat(" ", width-len(str)+2+extra))
 	s.printer.writeStyled(style, str)
 	s.printer.writeStyled(s.printer.config.Theme.Muted, " "+s.printer.config.Characters.Mid+" ")
 }

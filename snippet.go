@@ -15,6 +15,7 @@ type Snippet struct {
 	message  string
 	pad      int
 	tabWidth int
+	margin   int
 }
 
 func (*Snippet) block() {}
@@ -59,6 +60,12 @@ func (s Snippet) TabWidth(width int) Snippet {
 	return s
 }
 
+func (s Snippet) Margin(spaces int) Snippet {
+	s.margin = spaces
+
+	return s
+}
+
 func (s Snippet) effectivePad() int {
 	if s.pad > 0 {
 		return s.pad
@@ -73,6 +80,14 @@ func (s Snippet) effectiveTabWidth() int {
 	}
 
 	return defaultTabWidth
+}
+
+func (s Snippet) effectiveMargin() int {
+	if s.margin > 0 {
+		return s.margin
+	}
+
+	return 0
 }
 
 func (s Snippet) isSingleLine() bool {
