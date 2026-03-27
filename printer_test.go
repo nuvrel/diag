@@ -101,8 +101,8 @@ func TestPrinter(t *testing.T) {
 		{
 			name: "header func",
 			config: diag.Config{
-				HeaderFunc: func(severity, code, message string) string {
-					header := strings.ToUpper(severity)
+				HeaderFunc: func(sev diag.Severity, label, code, message string) string {
+					header := strings.ToUpper(label)
 
 					if code != "" {
 						header += " " + code
