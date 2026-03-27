@@ -2,6 +2,7 @@ package diag_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/charmbracelet/colorprofile"
@@ -11,8 +12,9 @@ import (
 
 func TestPrinter(t *testing.T) {
 	cases := []struct {
-		name  string
-		diags []diag.Diagnostic
+		name   string
+		config diag.Config
+		diags  []diag.Diagnostic
 	}{
 		{
 			name:  "error",
@@ -62,6 +64,69 @@ func TestPrinter(t *testing.T) {
 				diag.NewError("another error"),
 			},
 		},
+		{
+			name: "margin",
+			config: diag.Config{
+				Margin: 4,
+			},
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").
+					Detail("This is a detailed explanation.").
+					Help("try this instead").
+					Note("see the docs"),
+			},
+		},
+		{
+			name: "skip header",
+			config: diag.Config{
+				SkipHeader: true,
+			},
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").
+					Detail("This is a detailed explanation.").
+					Help("try this instead"),
+			},
+		},
+		{
+			name: "skip detail",
+			config: diag.Config{
+				SkipDetail: true,
+			},
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").
+					Detail("This is a detailed explanation.").
+					Help("try this instead"),
+			},
+		},
+		{
+			name: "header func",
+			config: diag.Config{
+				HeaderFunc: func(severity, code, message string) string {
+					header := strings.ToUpper(severity)
+
+					if code != "" {
+						header += " " + code
+					}
+
+					return header + " >> " + message
+				},
+			},
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").Code("E001"),
+			},
+		},
+		{
+			name: "detail func",
+			config: diag.Config{
+				DetailFunc: func(detail []string) string {
+					return ">>> " + strings.Join(detail, " | ")
+				},
+			},
+			diags: []diag.Diagnostic{
+				diag.NewError("something went wrong").
+					Detail("First paragraph.", "Second paragraph."),
+			},
+		},
 	}
 
 	for _, c := range cases {
@@ -74,6 +139,11 @@ func TestPrinter(t *testing.T) {
 				Characters:     diag.DefaultCharacters(),
 				Prefixes:       diag.DefaultPrefixes(),
 				SeverityLabels: diag.DefaultSeverityLabels(),
+				Margin:         c.config.Margin,
+				HeaderFunc:     c.config.HeaderFunc,
+				DetailFunc:     c.config.DetailFunc,
+				SkipHeader:     c.config.SkipHeader,
+				SkipDetail:     c.config.SkipDetail,
 			}
 
 			var buf bytes.Buffer

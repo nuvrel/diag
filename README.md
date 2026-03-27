@@ -61,7 +61,6 @@ cfg := diag.Config{
 	Characters:     diag.DefaultCharacters(),
 	Prefixes:       diag.DefaultPrefixes(),
 	SeverityLabels: diag.DefaultSeverityLabels(),
-	DetailPad:      2,
 }
 ```
 
@@ -155,6 +154,61 @@ cfg := diag.Config{
 }
 ```
 
+**Margin**
+
+Controls the number of leading spaces added to every line of output that has content, leaving blank lines untouched. Useful for visually nesting diagnostics within other content (default `0`):
+
+```go
+cfg := diag.Config{
+	// ...
+	Margin: 4,
+}
+```
+
+**SkipHeader / SkipDetail**
+
+Controls whether the header or detail section is suppressed. Use these when the caller renders its own header or detail and only needs the remaining parts from the printer:
+
+```go
+cfg := diag.Config{
+	// ...
+	SkipHeader: true,
+	SkipDetail: true,
+}
+```
+
+**HeaderFunc**
+
+Controls the header rendering. When non-nil, replaces the default renderer. It receives the severity label, error code (may be empty), and message, and must return a fully rendered string:
+
+```go
+cfg := diag.Config{
+	// ...
+	HeaderFunc: func(severity, code, message string) string {
+		header := strings.ToUpper(severity)
+
+		if code != "" {
+			header += "[" + code + "]"
+		}
+
+		return header + ": " + message
+	},
+}
+```
+
+**DetailFunc**
+
+Controls the detail rendering. When non-nil, replaces the default renderer. It receives the detail paragraphs and must return a fully rendered string:
+
+```go
+cfg := diag.Config{
+	// ...
+	DetailFunc: func(detail []string) string {
+		return strings.Join(detail, "\n\n")
+	},
+}
+```
+
 ## API
 
 **Diagnostics**
@@ -165,6 +219,8 @@ cfg := diag.Config{
 - `.Snippet(s)` attaches a source code snippet
 - `.Help(text)` appends a help note
 - `.Note(text)` appends an informational note
+- `.Severity()` returns the severity level of the diagnostic
+- `.Message()` returns the primary message of the diagnostic
 
 Regardless of the order methods are chained, the output always renders in a fixed sequence: header, detail, snippets, then hints (help and note).
 
@@ -176,6 +232,7 @@ Regardless of the order methods are chained, the output always renders in a fixe
 - `.Message(text)` sets the label shown under the highlight
 - `.Pad(n)` sets how many context lines to show around the highlight (default 2)
 - `.TabWidth(n)` sets the tab width used for alignment (default 4)
+- `.Margin(n)` adds leading spaces to every line inside the snippet block
 
 ## Stability
 

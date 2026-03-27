@@ -45,3 +45,11 @@ func (d Diagnostic) Note(content string) Diagnostic {
 
 	return d
 }
+
+func (d Diagnostic) Severity() Severity {
+	return d.severity
+}
+
+func (d Diagnostic) Message() string {
+	return d.message
+}

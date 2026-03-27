@@ -67,6 +67,17 @@ func fetch(id int) (string, error) {
 			name: "file only",
 			diag: diag.NewError("you can't do that").Snippet(diag.NewSnippet(src).File("fetch.go")),
 		},
+		{
+			name: "custom margin",
+			diag: diag.NewError("you can't do that").
+				Snippet(diag.NewSnippet(src).
+					File("fetch.go").
+					From(10, 14).
+					To(10, 24).
+					Message("dynamic error created here").
+					Margin(4),
+				),
+		},
 	}
 
 	for _, c := range cases {

@@ -91,13 +91,22 @@ func blockRank(b block) int {
 }
 
 func (p *Printer) printDetail(d Diagnostic) {
-	if len(d.detail) == 0 {
+	if p.config.SkipDetail || len(d.detail) == 0 {
 		return
 	}
 
-	indent := strings.Repeat(" ", p.config.effectiveDetailPad())
+	if p.config.DetailFunc != nil {
+		p.write(p.config.DetailFunc(d.detail))
+		p.writeln()
 
-	p.writeln()
+		return
+	}
+
+	if !p.config.SkipHeader {
+		p.writeln()
+	}
+
+	indent := strings.Repeat(" ", p.config.effectiveDetailPad())
 
 	for _, pg := range d.detail {
 		for line := range strings.SplitSeq(pg, "\n") {
@@ -118,6 +127,13 @@ func (p *Printer) flush() error {
 }
 
 func (p *Printer) write(text string) {
+	hasMargin := p.config.Margin > 0
+	lineStart := p.buffer.Len() == 0 || p.buffer.Bytes()[p.buffer.Len()-1] == '\n'
+
+	if hasMargin && lineStart && text != "" {
+		p.buffer.WriteString(strings.Repeat(" ", p.config.Margin))
+	}
+
 	p.buffer.WriteString(text)
 }
 
@@ -149,7 +165,18 @@ func (p *Printer) styleFor(s Severity) lipgloss.Style {
 }
 
 func (p *Printer) printHeader(d Diagnostic) {
+	if p.config.SkipHeader {
+		return
+	}
+
 	label := p.config.SeverityLabels.labelFor(d.severity)
+
+	if p.config.HeaderFunc != nil {
+		p.write(p.config.HeaderFunc(label, d.code, d.message))
+		p.writeln()
+
+		return
+	}
 
 	if d.code != "" {
 		label += "[" + d.code + "]"
