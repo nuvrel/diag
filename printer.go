@@ -172,7 +172,7 @@ func (p *Printer) printHeader(d Diagnostic) {
 	label := p.config.SeverityLabels.labelFor(d.severity)
 
 	if p.config.HeaderFunc != nil {
-		p.write(p.config.HeaderFunc(label, d.code, d.message))
+		p.write(p.config.HeaderFunc(d.severity, label, d.code, d.message))
 		p.writeln()
 
 		return

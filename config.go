@@ -48,7 +48,7 @@ type Config struct {
 	SeverityLabels SeverityLabels
 	DetailPad      int
 	Margin         int
-	HeaderFunc     func(severity, code, message string) string
+	HeaderFunc     func(sev Severity, label, code, message string) string
 	DetailFunc     func(detail []string) string
 	SkipHeader     bool
 	SkipDetail     bool

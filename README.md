@@ -179,13 +179,13 @@ cfg := diag.Config{
 
 **HeaderFunc**
 
-Controls the header rendering. When non-nil, replaces the default renderer. It receives the severity label, error code (may be empty), and message, and must return a fully rendered string:
+Controls the header rendering. When non-nil, replaces the default renderer. It receives the severity, label, error code (may be empty), and message, and must return a fully rendered string:
 
 ```go
 cfg := diag.Config{
 	// ...
-	HeaderFunc: func(severity, code, message string) string {
-		header := strings.ToUpper(severity)
+	HeaderFunc: func(sev diag.Severity, label, code, message string) string {
+		header := strings.ToUpper(label)
 
 		if code != "" {
 			header += "[" + code + "]"
